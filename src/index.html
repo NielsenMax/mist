@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIST — desensibilización de planillas</title>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<header class="barra">
+  <div class="marca"><b>MIST</b><span>desensibilización de planillas</span></div>
+
+  <div class="proyecto" id="caja-proyecto" hidden>
+    <span class="etq">proyecto</span>
+    <b id="nombre-proyecto"></b>
+    <span class="guardado" id="estado-guardado"></span>
+  </div>
+
+  <div class="clave" id="caja-clave" hidden title="Huella de la clave maestra. Dos proyectos con la misma huella producen los mismos tokens.">
+    <span class="etq">clave</span>
+    <code id="huella">········</code>
+  </div>
+
+  <div class="acciones" id="acciones-barra" hidden>
+    <button id="btn-guardar">Guardar bóveda</button>
+  </div>
+</header>
+
+<!-- Sin proyecto no se carga nada: una planilla desensibilizada sin su bóveda
+     no se puede volver a cruzar ni a reconstruir. -->
+<section class="portada" id="portada">
+  <div class="portada-caja">
+    <h1>Elegí un proyecto para empezar</h1>
+    <p class="portada-intro" id="portada-intro">
+      Un proyecto es una carpeta con la clave maestra, las fusiones confirmadas y el
+      mapa de cada token a su valor real. Sin esa carpeta, las planillas que salgan
+      de acá no se pueden volver a cruzar con nada ni reconstruir. Por eso va
+      primero, y por eso se guarda sola con cada cambio.
+    </p>
+
+    <div class="aviso" id="portada-aviso" hidden></div>
+
+    <div class="portada-opciones">
+      <button class="tarjeta" id="btn-nuevo">
+        <b>Crear un proyecto</b>
+        <span id="nota-nuevo">Elegís una carpeta vacía y MIST escribe la bóveda ahí.</span>
+      </button>
+      <button class="tarjeta" id="btn-abrir">
+        <b>Abrir un proyecto</b>
+        <span id="nota-abrir">Elegís la carpeta de un proyecto que ya existe.</span>
+      </button>
+    </div>
+
+    <div class="portada-alterna">
+      <button class="fino" id="btn-abrir-archivo">Abrir desde un archivo de bóveda</button>
+    </div>
+  </div>
+</section>
+
+<div class="cuerpo" id="cuerpo" hidden>
+  <aside class="lateral">
+    <h2>Archivos</h2>
+    <div class="lista-archivos" id="lista-archivos"></div>
+    <button class="soltar" id="soltar">
+      <b>Soltá tus planillas acá</b>
+      CSV, TSV, XLSX, XLS u ODS
+    </button>
+  </aside>
+
+  <main class="principal">
+    <nav class="pestanias" id="pestanias"></nav>
+
+    <section class="panel" id="panel-columnas"></section>
+    <section class="panel" id="panel-entidades" hidden></section>
+    <section class="panel" id="panel-fusiones" hidden></section>
+    <section class="panel" id="panel-previa" hidden></section>
+    <section class="panel" id="panel-salida" hidden></section>
+    <section class="panel" id="panel-reconstruir" hidden></section>
+  </main>
+</div>
+
+<input type="file" id="entrada-archivos" multiple accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xlsb,.xls,.ods" hidden>
+<input type="file" id="entrada-reconstruir" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xlsb,.xls,.ods" hidden>
+<input type="file" id="entrada-boveda" accept=".json,.zip" hidden>
+<input type="file" id="entrada-carpeta" webkitdirectory directory hidden>
+
+<dialog id="dialogo">
+  <form method="dialog" class="contenido">
+    <h3 id="dlg-titulo"></h3>
+    <p id="dlg-texto"></p>
+    <div class="campos" id="dlg-campos"></div>
+    <!-- Aceptar va primero en el DOM para que Enter lo dispare; el pie lo
+         muestra a la derecha. -->
+    <div class="pie">
+      <button value="aceptar" class="primario" id="dlg-aceptar"></button>
+      <button value="cancelar" id="dlg-cancelar">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="../vendor/papaparse.min.js"></script>
+<script src="../vendor/xlsx.full.min.js"></script>
+<script src="00-hash.js"></script>
+<script src="10-tipos.js"></script>
+<script src="20-entidades.js"></script>
+<script src="30-io.js"></script>
+<script src="40-proyecto.js"></script>
+<script src="45-zip.js"></script>
+<script src="50-boveda.js"></script>
+<script src="55-almacen.js"></script>
+<script src="60-ui.js"></script>
+</body>
+</html>

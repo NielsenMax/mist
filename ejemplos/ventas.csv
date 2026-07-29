@@ -1,0 +1,8 @@
+fecha,vendedor,cliente,cuit_cliente,monto,observaciones
+2026-03-02,Lucía Vieytes,Joaquín Pérez,30-71234567-9,14350.50,Cierre de cuenta anual con Acme SRL
+2026-03-05,Diego Barrionuevo,María González,30-68899221-4,8200.00,"Llamó María González para reprogramar la entrega"
+2026-03-11,Lucía Vieytes,"Pérez, Joaquín",30712345679,980.75,Ajuste solicitado por Joaquín Pérez el viernes
+2026-03-14,Ana Lorenzo,Lucía Vieytes,33-71988877-9,3400.00,Venta interna
+2026-03-19,Diego Barrionuevo,Ana Lopez,27-31998877-2,900.00,"Ana Lopez pidió factura a nombre de Lopez Consultora"
+2026-03-22,Lucía Vieytes,Joaquin Peres,30-71234567-9,15.00,Nota de crédito
+2026-03-28,Ana Lorenzo,Maria Gonzalez,30-68899221-4,120.00,Reclamo derivado a Bertoldi y Cía SA

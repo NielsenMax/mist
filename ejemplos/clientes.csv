@@ -1,0 +1,11 @@
+id_cliente,nombre,razon_social,cuit,email,telefono,localidad,saldo
+CL-001,Joaquín Pérez,Acme SRL,30-71234567-9,joaquin.perez@acme.com.ar,11-4555-2211,Vicente López,14350.50
+CL-002,María González,Bertoldi y Cía SA,30-68899221-4,mgonzalez@bertoldi.com,11-4788-0912,Quilmes,-2200.00
+CL-003,"Pérez, Joaquín",ACME S.R.L.,30712345679,joaquin.perez@acme.com.ar,1145552211,Vicente Lopez,980.75
+CL-004,Ana Lorenzo,Lorenzo Hermanos SH,27-30112233-8,ana@lorenzohnos.com.ar,341-555-8877,Rosario,5600.00
+CL-005,Joaquin Peres,Acme S.R.L,30-71234567-9,j.perez@acme.com.ar,11 4555 2211,Vicente López,0.00
+CL-006,Sr. Diego Barrionuevo,Barrionuevo Diego,20-25443311-7,dbarrionuevo@gmail.com,351-444-9090,Córdoba,7810.20
+CL-007,Maria Gonzalez,Bertoldi y Compañía S.A.,30-68899221-4,mgonzalez@bertoldi.com,11-4788-0912,Quilmes,120.00
+CL-008,Lucía Vieytes,Norte Logística SAS,33-71988877-9,lvieytes@nortelog.com,11-6122-3344,San Isidro,3400.00
+CL-009,J. Pérez,Acme SRL,30-71234567-9,joaquin.perez@acme.com.ar,11-4555-2211,Vicente López,15.00
+CL-010,Ana Lopez,Lopez Consultora,27-31998877-2,alopez@consultora.com,11-5000-1122,CABA,900.00
