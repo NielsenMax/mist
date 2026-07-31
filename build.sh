@@ -1,10 +1,15 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Arma mist.html: un único archivo autocontenido que funciona con doble clic,
 # sin servidor y sin internet. Toma src/index.html y le mete adentro el CSS y
 # todos los <script src> (vendor incluido).
-set -euo pipefail
+#
+# POSIX a propósito: los contenedores de build mínimos traen dash y no bash, y
+# un shebang que apunta a un intérprete que no está da "not found" sobre el
+# script, que es de los errores más difíciles de leer. Lo único que se pierde
+# es pipefail, que acá no hace nada porque no hay ninguna tubería.
+set -eu
 
-raiz="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+raiz="$(cd "$(dirname "$0")" && pwd)"
 salida="$raiz/mist.html"
 
 python3 - "$raiz" "$salida" <<'PY'
