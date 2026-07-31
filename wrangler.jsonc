@@ -1,0 +1,9 @@
+{
+  // Sitio estático y nada más: no hay código de servidor, sólo el directorio
+  // que arma build.sh. El _headers de adentro es el que lleva el CSP.
+  "name": "mist",
+  "compatibility_date": "2026-07-31",
+  "assets": {
+    "directory": "./build"
+  }
+}
