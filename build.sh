@@ -40,3 +40,10 @@ if sobran:
 pathlib.Path(salida).write_text(html, encoding='utf-8')
 print('%s  %.1f MB' % (salida, os.path.getsize(salida) / 1048576))
 PY
+
+# El sitio para Cloudflare Pages, que sirve un directorio y busca index.html
+# adentro. Es el mismo archivo con otro nombre: no hay una versión "web" y otra
+# de escritorio. Al lado queda _headers, que está versionado y no se toca acá.
+mkdir -p "$raiz/build"
+cp "$salida" "$raiz/build/index.html"
+echo "$raiz/build/index.html"

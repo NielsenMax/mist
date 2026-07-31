@@ -2,3 +2,8 @@
 
 # mist.html NO va acá: es el entregable, y está versionado a propósito para que
 # bajarlo y abrirlo alcance, sin build ni instalación.
+
+# build/ es el directorio que publica Cloudflare Pages. index.html es una copia
+# de mist.html que arma build.sh; build/_headers sí va versionado, porque es el
+# que lleva el CSP.
+build/index.html

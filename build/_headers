@@ -1,0 +1,15 @@
+# Cabeceras para Cloudflare Pages. Se aplican a todo lo que se sirva desde acá
+# y el archivo no se publica.
+#
+# El CSP es lo que importa: default-src 'none' cubre connect-src, así que el
+# navegador bloquea cualquier fetch, XHR o WebSocket que la página intente.
+# "No hay ninguna petición de red en toda la aplicación" deja de ser algo que
+# hay que creerle al código y pasa a ser algo que el navegador hace cumplir.
+#
+# Los 'unsafe-inline' hacen falta porque build.sh mete el CSS y todo el JS
+# adentro del HTML. No hace falta 'unsafe-eval': ni SheetJS ni PapaParse usan
+# eval, new Function ni workers.
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; form-action 'none'; frame-ancestors 'none'; base-uri 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
