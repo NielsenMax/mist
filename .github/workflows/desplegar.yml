@@ -19,7 +19,7 @@ jobs:
     env:
       TOKEN: ${{ secrets.CF_TOKEN_FERNET }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # mist.html está versionado ya construido y es el entregable: lo que se
       # publica tiene que ser exactamente el archivo que alguien puede bajar del
@@ -40,7 +40,7 @@ jobs:
     env:
       TOKEN: ${{ secrets.CF_TOKEN_HANSENLABS }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: mist.html al día con src/
         run: sh build.sh && git diff --exit-code mist.html
