@@ -1,0 +1,52 @@
+# Publica el mismo commit en las dos cuentas de Cloudflare. Cada una tiene su
+# Worker y su dominio; wrangler.jsonc no declara rutas justamente para que la
+# misma configuración sirva a las dos sin que ninguna intente adueñarse de la
+# zona de la otra. Los dominios se atan una sola vez, a mano, en cada cuenta.
+#
+# Un trabajo sin sus credenciales cargadas se saltea en vez de fallar, así que
+# esto se puede tener andando con una cuenta mientras la otra se configura.
+name: desplegar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  fernet:
+    name: mist.fernet.cc
+    runs-on: ubuntu-latest
+    env:
+      TOKEN: ${{ secrets.CF_TOKEN_FERNET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # mist.html está versionado ya construido y es el entregable: lo que se
+      # publica tiene que ser exactamente el archivo que alguien puede bajar del
+      # repositorio y comparar por hash. Reconstruirlo acá los haría divergir en
+      # silencio, así que en vez de eso se verifica que estén iguales.
+      - name: mist.html al día con src/
+        run: sh build.sh && git diff --exit-code mist.html
+
+      - uses: cloudflare/wrangler-action@v4
+        if: env.TOKEN != ''
+        with:
+          apiToken: ${{ secrets.CF_TOKEN_FERNET }}
+          accountId: ${{ secrets.CF_ACCOUNT_FERNET }}
+
+  hansenlabs:
+    name: mist.hansenlabs.dev
+    runs-on: ubuntu-latest
+    env:
+      TOKEN: ${{ secrets.CF_TOKEN_HANSENLABS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: mist.html al día con src/
+        run: sh build.sh && git diff --exit-code mist.html
+
+      - uses: cloudflare/wrangler-action@v4
+        if: env.TOKEN != ''
+        with:
+          apiToken: ${{ secrets.CF_TOKEN_HANSENLABS }}
+          accountId: ${{ secrets.CF_ACCOUNT_HANSENLABS }}
