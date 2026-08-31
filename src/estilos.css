@@ -64,11 +64,14 @@ button.primario {
   background: var(--tinta); color: var(--panel); border-color: var(--tinta);
 }
 button.primario:hover:not(:disabled) { background: #000; border-color: #000; }
-button.fino {
+/* El enlace a la página de instalación de la skill comparte esta pinta con los
+ * botones finos: en la portada son la misma clase de acción secundaria. */
+button.fino, a.fino {
   border: 0; background: none; padding: 2px 6px; color: var(--grafito);
   text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
 }
-button.fino:hover { color: var(--tinta); background: none; }
+a.fino { font: inherit; cursor: pointer; }
+button.fino:hover, a.fino:hover { color: var(--tinta); background: none; }
 
 select, input[type="text"], input[type="password"], input[type="search"] {
   font: inherit;

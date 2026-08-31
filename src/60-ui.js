@@ -1751,6 +1751,13 @@
       $('nota-abrir').textContent = 'De este navegador, de una carpeta o de un .zip.';
     }
 
+    /* La página de instalación de la skill vive en el sitio, no adentro de este
+     * archivo. Abierto con doble clic desde el disco no hay dónde ir, así que el
+     * enlace se muestra sólo cuando esto se sirve por web. */
+    if (/^https?:$/.test(global.location.protocol)) {
+      $('enlace-fiscal').hidden = false;
+    }
+
     /* Cerrar con cambios sin guardar es exactamente el accidente que esta
      * herramienta tiene que evitar. El navegador no deja elegir el texto del
      * cartel, pero sí frenar el cierre. returnValue es sólo para los Chrome

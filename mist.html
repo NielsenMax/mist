@@ -71,11 +71,14 @@ button.primario {
   background: var(--tinta); color: var(--panel); border-color: var(--tinta);
 }
 button.primario:hover:not(:disabled) { background: #000; border-color: #000; }
-button.fino {
+/* El enlace a la página de instalación de la skill comparte esta pinta con los
+ * botones finos: en la portada son la misma clase de acción secundaria. */
+button.fino, a.fino {
   border: 0; background: none; padding: 2px 6px; color: var(--grafito);
   text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
 }
-button.fino:hover { color: var(--tinta); background: none; }
+a.fino { font: inherit; cursor: pointer; }
+button.fino:hover, a.fino:hover { color: var(--tinta); background: none; }
 
 select, input[type="text"], input[type="password"], input[type="search"] {
   font: inherit;
@@ -546,6 +549,9 @@ dialog .pie { display: flex; flex-direction: row-reverse; justify-content: flex-
 
     <div class="portada-alterna">
       <button class="fino" id="btn-abrir-archivo">Abrir desde un archivo de bóveda</button>
+      <!-- Sólo aparece servido por web: en el archivo que se baja y se abre con
+           doble clic el enlace no llevaría a ninguna parte. Lo muestra 60-ui.js. -->
+      <a class="fino" id="enlace-fiscal" href="fiscal.html" hidden>Analizar una causa con Claude</a>
     </div>
   </div>
 </section>
@@ -5308,6 +5314,13 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
         ? 'Se guarda solo en el navegador; la copia en disco la bajás como .zip.'
         : 'La bóveda se baja como un archivo único que guardás vos.';
       $('nota-abrir').textContent = 'De este navegador, de una carpeta o de un .zip.';
+    }
+
+    /* La página de instalación de la skill vive en el sitio, no adentro de este
+     * archivo. Abierto con doble clic desde el disco no hay dónde ir, así que el
+     * enlace se muestra sólo cuando esto se sirve por web. */
+    if (/^https?:$/.test(global.location.protocol)) {
+      $('enlace-fiscal').hidden = false;
     }
 
     /* Cerrar con cambios sin guardar es exactamente el accidente que esta
