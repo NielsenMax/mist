@@ -325,6 +325,28 @@ en el disco*: podés trabajar todo lo que quieras, pero para descargar una plani
 desensibilizada tenés que haber bajado el zip después del último cambio. Lo mismo
 vale para cerrar la pestaña.
 
+## Analizar con Claude Desktop
+
+MIST prepara las planillas; lo que viene después —qué se manda, qué nunca sale
+del disco, cómo se verifica que la desensibilización efectivamente ocurrió— está
+en `skill/`, como una skill de Claude Desktop.
+
+La idea es una sola línea:
+
+```
+~/Casos/<causa>/          tiene TOKENS      Claude sí
+~/Reservado/<causa>/      tiene NOMBRES     Claude nunca
+```
+
+Dos árboles separados y no dos subcarpetas del mismo, porque una carpeta padre
+que contiene las dos cosas se termina adjuntando entera. Del lado reservado
+quedan las planillas originales, la bóveda —que incluye la clave maestra— y los
+informes ya reconstruidos.
+
+La skill impone un chequeo antes de leer cualquier dato, arma la base DuckDB de
+la causa para poder consultarla sin escribir SQL a mano, y verifica que lo que
+hay en `limpio/` haya pasado de verdad por MIST. Detalle en `skill/README.md`.
+
 ## Cómo se generan los tokens
 
 ```
@@ -456,6 +478,7 @@ src/
 vendor/              SheetJS y PapaParse
 ejemplos/            planillas de prueba con duplicados a propósito
 pruebas/             las suites, más un driver de Chrome por CDP
+skill/               la skill de Claude Desktop, con su propio README
 ```
 
 Para desarrollar, abrí `src/index.html` directo con doble clic y recargá: es la
