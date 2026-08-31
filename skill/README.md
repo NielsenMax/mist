@@ -38,7 +38,21 @@ mist-causa/
     olfatear.sh             ¿MIST realmente corrió sobre esto?
     nueva-causa.sh          alta de una causa en los dos árboles
     ingestar.sh             arma la base DuckDB desde limpio/
+  probar.sh                 las comprobaciones, en un HOME de mentira
 ```
+
+## Probar
+
+```sh
+./skill/probar.sh
+```
+
+Corre los guiones contra un `HOME` de mentira en un temporal que se borra al
+salir: no toca tu directorio personal y no necesita internet. Cubre el
+instalador, el alta de causa, los siete escenarios de carpetas de confianza, el
+olfateo sobre planillas crudas y tokenizadas, y la ingesta.
+
+Lo que no cubre, porque sólo se puede ver adentro de Claude Desktop: el canario.
 
 ## Instalar
 
