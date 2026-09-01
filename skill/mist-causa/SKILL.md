@@ -40,9 +40,9 @@ El guión imprime líneas con prefijo `BLOQUEO:`, `AVISO:` u `OK:`.
 
 - **`BLOQUEO:`** — parar. No leer ningún archivo de datos, no correr consultas.
   Explicarle al fiscal en castellano llano qué está mal y qué tiene que hacer.
-  El caso más importante: si `~/Reservado` o el directorio personal figuran
-  entre las carpetas de confianza de Claude, la separación no existe y todo lo
-  demás es decoración.
+  El caso más importante: si falta la regla que impide leer `~/Reservado`, o
+  está escrita con una forma que no deniega nada, la separación no existe y todo
+  lo demás es decoración. La agrega el instalador.
 - **`AVISO:`** — se puede seguir, pero hay que decírselo al fiscal antes.
 - **`OK:`** — seguir.
 
@@ -52,13 +52,14 @@ El guión imprime líneas con prefijo `BLOQUEO:`, `AVISO:` u `OK:`.
 y por lo tanto no prueba nada.
 
 - **La lectura falla** → bien, el límite está donde tiene que estar.
-- **La lectura tiene éxito** → parar. La separación no existe: Claude puede
-  llegar a las planillas originales y a la clave maestra. Decírselo al fiscal
-  con todas las letras y no analizar nada hasta que `~/Reservado` salga de las
-  carpetas de confianza.
+- **La lectura tiene éxito** → parar. Da igual lo que diga el archivo de
+  configuración: la separación no existe y Claude puede llegar a las planillas
+  originales y a la clave maestra. Decírselo al fiscal con todas las letras y no
+  analizar nada.
 
-Es la única prueba empírica de la propiedad que sostiene todo el sistema, y no
-depende de dónde guarde su configuración esta versión de Claude Desktop.
+El guión comprueba que la regla esté escrita; el canario comprueba que se esté
+aplicando. Son cosas distintas y hacen falta las dos: el guión corre en un shell,
+y el shell no pasa por las reglas de permisos.
 
 Tercero, antes de la primera consulta sobre datos:
 

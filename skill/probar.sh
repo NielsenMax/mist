@@ -44,6 +44,14 @@ existe Casos              "crea el árbol de casos"
 existe Reservado          "crea el árbol reservado"
 existe Reservado/CANARIO.txt "deja el canario"
 existe Reservado/LEEME.txt   "deja el leeme"
+existe .claude/settings.json "escribe la regla de denegación"
+python3 -c "
+import json,os,sys
+d=json.load(open(os.path.expanduser('~/.claude/settings.json')))
+r='Read(//%s/Reservado/**)' % os.environ['HOME'].strip('/')
+sys.exit(0 if r in d.get('permissions',{}).get('deny',[]) else 1)
+" && ok "la regla tiene la forma que Claude Code aplica" \
+  || falla "la regla tiene la forma que Claude Code aplica"
 printf 's\n\n' | sh "$guiones/instalar-mist.command" >/dev/null 2>&1
 ok "se puede volver a correr sin romper nada"
 
@@ -61,20 +69,35 @@ existe Casos/2026-114-defraudacion/registro.md    "deja el registro abierto"
 salida 0 "se puede volver a correr"         sh "$guiones/nueva-causa.sh" 2026-114-defraudacion
 
 echo
-echo "── carpetas de confianza ───────────────────────────────────────────"
+echo "── regla de denegación ─────────────────────────────────────────────"
 CAUSA="$HOME/Casos/2026-114-defraudacion"
+regla() { printf '{"permissions":{"deny":[%s]}}' "$1" > "$HOME/.claude/settings.json"; }
+
+salida 0 "acepta la forma con dos barras"  sh "$guiones/verificar-entorno.sh"
+regla "\"Read(~/Reservado/**)\""
+salida 0 "acepta la forma con virgulilla"  sh "$guiones/verificar-entorno.sh"
+# $HOME ya trae su barra: esto es la forma de una sola barra.
+regla "\"Read($HOME/Reservado/**)\""
+salida 1 "bloquea la forma de una barra, que falla en silencio" sh "$guiones/verificar-entorno.sh"
+sh "$guiones/verificar-entorno.sh" 2>&1 | grep -q "no deniega nada" \
+  && ok "explica por qué esa forma no sirve" || falla "explica por qué esa forma no sirve"
+regla "\"Write(//${HOME#/}/Reservado/**)\",\"Glob(//${HOME#/}/Reservado/**)\""
+salida 1 "bloquea si sólo hay reglas inertes" sh "$guiones/verificar-entorno.sh"
+regla ""
+salida 1 "bloquea si no hay ninguna regla"    sh "$guiones/verificar-entorno.sh"
+rm -f "$HOME/.claude/settings.json"
+salida 1 "bloquea si no hay settings.json"    sh "$guiones/verificar-entorno.sh"
+regla "\"Read(//${HOME#/}/Reservado/**)\""
+salida 0 "vuelve a estar en orden"            sh "$guiones/verificar-entorno.sh"
+
+echo
+echo "── carpetas de confianza (señal secundaria) ────────────────────────"
 confianza "\"$HOME/Casos\""
-salida 0 "acepta que sólo esté ~/Casos"                 sh "$guiones/verificar-entorno.sh"
-confianza "\"$CAUSA\""
-salida 0 "acepta una causa puntual"                     sh "$guiones/verificar-entorno.sh"
+salida 0 "no dice nada si sólo está ~/Casos"            sh "$guiones/verificar-entorno.sh"
 confianza "\"$HOME\""
-salida 1 "bloquea si está el home entero"               sh "$guiones/verificar-entorno.sh"
-confianza "\"$HOME/Reservado\""
-salida 1 "bloquea si está el árbol reservado"           sh "$guiones/verificar-entorno.sh"
-confianza "\"$HOME/Reservado/2026-114-defraudacion/boveda\""
-salida 1 "bloquea si está la bóveda de una causa"       sh "$guiones/verificar-entorno.sh"
-confianza '"/"'
-salida 1 "bloquea si está la raíz del disco"            sh "$guiones/verificar-entorno.sh"
+sh "$guiones/verificar-entorno.sh" 2>&1 | grep -q "AVISO.*abarca el árbol reservado" \
+  && ok "avisa si el home entero es de confianza" || falla "avisa si el home entero es de confianza"
+salida 0 "pero no bloquea: la clave no es de fiar"      sh "$guiones/verificar-entorno.sh"
 printf '{no es json' > "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 salida 0 "avisa en vez de explotar con un json roto"    sh "$guiones/verificar-entorno.sh"
 confianza "\"$HOME/Casos\""

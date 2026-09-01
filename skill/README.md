@@ -79,9 +79,12 @@ tener la skill:
 - **Copiar y pegar gana siempre.** La detección de datos personales en lo que
   llega por el chat es probabilística. Un fiscal decidido a pegar el expediente
   lo pega.
-- **No hay jaula.** En Claude Desktop estándar el límite es qué carpeta se
-  adjunta, y eso se decide de nuevo en cada sesión. El canario detecta que se
-  rompió; no lo impide.
+- **No hay jaula.** Adjuntar una carpeta no limita a dónde llegan las
+  herramientas de archivo: eso lo hace una regla de denegación en
+  `~/.claude/settings.json`, que el instalador escribe. La regla corta las
+  herramientas de archivo y los comandos de lectura que Claude Code reconoce en
+  Bash, pero **no un subproceso que abra archivos por su cuenta** — un guión de
+  Python la esquiva. Protege contra el descuido, no contra alguien decidido.
 - **Los nombres que sólo viven en texto libre siguen saliendo en claro.** Es el
   hueco que MIST declara en `MANUAL.md` §11: reconoce dentro de un comentario
   sólo las formas que ya vio en una columna clasificada. Taparlo requiere

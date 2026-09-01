@@ -21,19 +21,46 @@ la desensibilización entera:
 Si el fiscal pide algo que requiere leer de ahí, la respuesta es no, y la
 explicación es esta sección.
 
-## 2. El canario
+## 2. La regla de denegación, y el canario
 
-En `~/Reservado/CANARIO.txt` hay un archivo puesto por el instalador. Al empezar
-la sesión, **intentar leerlo con la herramienta de lectura de archivos** —no con
-`cat`, no con un guión; un guión lee cualquier cosa y no prueba nada.
+Adjuntar una carpeta **no es un límite**. Es el directorio de trabajo: las
+herramientas de archivo llegan a cualquier parte del disco a la que llegue el
+usuario. Lo único que corta el acceso a `~/Reservado` es una regla en
+`~/.claude/settings.json`:
 
-- **Si la lectura falla** — bien. El límite está donde tiene que estar.
-- **Si la lectura tiene éxito** — la separación no existe. Parar, decírselo al
-  fiscal con todas las letras y no analizar nada hasta que `~/Reservado` salga
-  de las carpetas de confianza de Claude.
+```json
+{ "permissions": { "deny": ["Read(//Users/<usuario>/Reservado/**)"] } }
+```
 
-Es la única prueba empírica de la propiedad que sostiene todo lo demás, y no
-depende de dónde guarde Claude Desktop su configuración esta versión.
+La forma exacta importa y falla en silencio si está mal. Comprobado corriendo
+Claude Code de verdad:
+
+| Forma | Qué hace |
+|---|---|
+| `Read(//ruta/**)` | deniega — **es la que hay que usar** |
+| `Read(~/ruta/**)` | deniega |
+| `Read(/ruta/**)` | **no deniega nada**, y no avisa |
+| `Write(…)`, `Glob(…)`, `Grep(…)` con ruta | inertes: `Read` ya cubre todo lo que lee |
+
+Sólo se deniega `Read`, a propósito. Denegar `Edit` además rompe el alta de
+causas: Claude Code deniega un `mkdir -p` entero si alguna de las rutas que
+nombra cae bajo la regla. Y acá el riesgo es que los nombres salgan, no que
+entren.
+
+El guión `verificar-entorno.sh` comprueba que la regla esté escrita y con la
+forma que funciona. Pero comprueba el texto, no el efecto: un guión corre en un
+shell y el shell no pasa por las reglas de permisos.
+
+**El efecto lo prueba el canario.** Intentar leer `~/Reservado/CANARIO.txt`
+**con la herramienta de lectura de archivos** —no con `cat`, no desde un guión:
+
+- **La lectura falla** → bien. La regla está y se está aplicando.
+- **La lectura tiene éxito** → parar. Da igual lo que diga el archivo de
+  configuración: Claude puede llegar a las planillas originales y a la clave
+  maestra. Decírselo al fiscal con todas las letras y no analizar nada.
+
+Es la única prueba del efecto y no depende de qué versión de Claude Desktop haya
+ni de dónde guarde su configuración.
 
 ## 3. Qué se manda
 

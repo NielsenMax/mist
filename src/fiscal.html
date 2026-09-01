@@ -256,22 +256,25 @@
       Claude deja en el escritorio un archivo <code>instalar-mist.command</code>.
       Se abre con doble clic —no hace falta usar la terminal— y pregunta antes de
       hacer nada. Crea las dos carpetas, instala DuckDB para poder consultar las
-      planillas, y baja MIST. No pide contraseña de administrador ni toca nada
-      fuera de tu usuario.
+      planillas, baja MIST, y <b>escribe la regla que le impide a Claude leer
+      <span class="mono">~/Reservado</span></b>. No pide contraseña de
+      administrador ni toca nada fuera de tu usuario.
     </p>
   </li>
   <li>
-    <h3>Adjuntar <span class="mono">~/Casos</span>, y sólo eso</h3>
+    <h3>Adjuntar <span class="mono">~/Casos</span></h3>
     <p>
-      Es el único paso que no se puede automatizar, y es el que sostiene todo lo
-      demás.
+      Es la carpeta sobre la que vas a trabajar. Adjuntar no es una barrera
+      —Claude puede alcanzar el resto del disco igual—, pero mantiene a la vista
+      sólo lo que tiene tokens.
     </p>
     <div class="alerta">
-      <h3>Nunca adjuntes ~/Reservado ni tu carpeta personal</h3>
+      <h3>Lo que te protege es la regla, no la carpeta que adjuntás</h3>
       <p>
-        Si Claude tiene acceso a tu carpeta personal, tiene acceso a la bóveda; y
-        con la bóveda, todos los tokens vuelven a ser nombres. La
-        desensibilización deja de proteger nada, sin que ningún cartel te avise.
+        Adjuntar una carpeta define dónde trabaja Claude, no hasta dónde llega.
+        Lo que corta el acceso a la bóveda es la regla que escribió el
+        instalador. Si esa regla no está, todos los tokens vuelven a ser nombres
+        y ningún cartel te avisa.
       </p>
     </div>
   </li>
@@ -279,9 +282,11 @@
     <h3>Comprobar que quedó bien</h3>
     <p>
       Antes de trabajar con datos de verdad, pedile a Claude que verifique el
-      entorno. Va a revisar qué carpetas tiene habilitadas e intentar leer un
-      archivo de <span class="mono">~/Reservado</span> que <b>tiene que fallar</b>.
-      Si lo lee, algo quedó mal configurado y te lo va a decir.
+      entorno. Va a comprobar que la regla esté escrita <i>y</i> va a intentar
+      leer un archivo de <span class="mono">~/Reservado</span> que <b>tiene que
+      fallar</b>. Son dos cosas distintas: una mira que la regla exista, la otra
+      que se esté aplicando. Si el archivo se lee, algo quedó mal y te lo va a
+      decir.
     </p>
   </li>
 </ol>
@@ -318,8 +323,10 @@
     mejore la redacción. Ese texto tiene nombres reales.
   </li>
   <li>
-    <b>La única barrera es qué carpeta adjuntás</b>, y eso se decide de nuevo en
-    cada sesión. La verificación detecta que se rompió; no lo impide.
+    <b>La regla corta las herramientas de archivo, no el sistema operativo.</b>
+    Un programa que Claude escriba y ejecute —un guión de Python, por ejemplo—
+    abre archivos por su cuenta y la regla no lo alcanza. Protege contra el
+    descuido, que es el riesgo real, no contra alguien decidido.
   </li>
   <li>
     <b>Los nombres que sólo viven en texto libre siguen saliendo en claro.</b>

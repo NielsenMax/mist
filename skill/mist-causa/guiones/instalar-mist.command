@@ -106,6 +106,72 @@ if [ -f "$RESERVADO/mist.html" ]; then
     >> "$RESERVADO/mist-versiones.txt"
 fi
 
+# --- Regla de denegación ----------------------------------------------------
+# Adjuntar una carpeta no impide que las herramientas de archivo lleguen al
+# resto del disco: el "adjuntar" es el directorio de trabajo, no un límite. Lo
+# único que corta el acceso es una regla de denegación.
+#
+# Sólo Read, y a propósito. Comprobado corriendo Claude Code de verdad:
+#
+#   Read(//ruta/**)   deniega            <- la forma que funciona
+#   Read(/ruta/**)    NO deniega nada    <- una barra: falla en silencio
+#   Read(~/ruta/**)   deniega
+#   Write, Glob, Grep con rutas son inertes: Read ya cubre todo lo que lee y
+#   Edit todo lo que escribe.
+#
+# Denegar Edit además sería tentador, pero rompe la creación de causas: Claude
+# Code deniega un `mkdir -p` entero si alguna de las rutas que nombra cae bajo
+# la regla. Y lo que hay que impedir acá es que los nombres salgan, no que
+# entren: leer es el riesgo, escribir no.
+echo
+python3 - "$HOME" <<'PY'
+import json, os, shutil, sys
+
+hogar = sys.argv[1]
+ruta = os.path.join(hogar, ".claude", "settings.json")
+# La forma canónica es // seguido de la ruta absoluta sin su barra inicial.
+regla = "Read(//%s/Reservado/**)" % hogar.strip("/")
+
+# Formas que no hacen nada y sólo ensucian el arranque con advertencias.
+inertes = {"%s(//%s/Reservado/**)" % (t, hogar.strip("/"))
+           for t in ("Write", "Glob", "Grep")}
+
+os.makedirs(os.path.dirname(ruta), exist_ok=True)
+datos = {}
+if os.path.exists(ruta):
+    try:
+        with open(ruta) as f:
+            datos = json.load(f)
+    except Exception as e:
+        print("  ! %s no se pudo leer (%s). No lo toco." % (ruta, e))
+        sys.exit(0)
+    shutil.copy2(ruta, ruta + ".antes-de-mist")
+
+permisos = datos.setdefault("permissions", {})
+deny = permisos.setdefault("deny", [])
+if not isinstance(deny, list):
+    print("  ! permissions.deny no es una lista. No lo toco.")
+    sys.exit(0)
+
+quitadas = [d for d in deny if d in inertes]
+deny = [d for d in deny if d not in inertes]
+if regla not in deny:
+    deny.append(regla)
+    puesta = True
+else:
+    puesta = False
+permisos["deny"] = deny
+
+with open(ruta, "w") as f:
+    json.dump(datos, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+
+print("  %s regla de denegación sobre ~/Reservado" % ("✓" if puesta else "✓ ya estaba la"))
+if quitadas:
+    print("  ✓ quitadas %d regla/s inertes (Write/Glob/Grep con ruta no hacen nada)"
+          % len(quitadas))
+PY
+
 # --- Cierre -----------------------------------------------------------------
 cat <<CIERRE
 
