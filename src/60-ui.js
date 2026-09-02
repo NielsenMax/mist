@@ -25,6 +25,12 @@
   var TOPE_LISTA = 300;
   var FILAS_PREVIA = 40;
 
+  /* Adónde mandar al operador cuando mist.html está abierto desde el disco y no
+   * hay un sitio alrededor. El proyecto se publica en dos dominios con el mismo
+   * contenido; acá va uno solo porque un archivo local no tiene cómo saber de
+   * cuál de los dos salió. */
+  var SITIO = 'https://mist.fernet.cc/';
+
   /* ── Utilidades ───────────────────────────────────────────────────── */
 
   function $(id) { return document.getElementById(id); }
@@ -1752,10 +1758,14 @@
     }
 
     /* La página de instalación de la skill vive en el sitio, no adentro de este
-     * archivo. Abierto con doble clic desde el disco no hay dónde ir, así que el
-     * enlace se muestra sólo cuando esto se sirve por web. */
-    if (/^https?:$/.test(global.location.protocol)) {
-      $('enlace-fiscal').hidden = false;
+     * archivo. Servido por web es la de al lado; abierto con doble clic desde el
+     * disco no hay una al lado, así que se apunta al sitio. Esconder el enlace
+     * sería peor: el caso del archivo local es justo el que más lo necesita.
+     *
+     * Que el enlace exista no rompe "ninguna petición de red": una navegación
+     * que hace el operador no es algo que la aplicación pida por su cuenta. */
+    if (!/^https?:$/.test(global.location.protocol)) {
+      $('enlace-fiscal').href = SITIO + 'fiscal.html';
     }
 
     /* Cerrar con cambios sin guardar es exactamente el accidente que esta

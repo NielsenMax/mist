@@ -42,6 +42,20 @@ function ok(nombre, cond, extra) {
     ok('y explica que la copia en disco es un .zip', /\.zip/.test(portada.aviso), portada.aviso.slice(-90));
     ok('la tarjeta de crear dice lo mismo', /navegador/.test(portada.notaNuevo), portada.notaNuevo);
 
+    // ── El enlace a la página de la skill, abierto como archivo
+    // Es el caso que más lo necesita: quien abre mist.html con doble clic es
+    // justamente quien todavía no instaló nada. Servido por web apunta al
+    // archivo de al lado; acá no hay uno al lado, así que tiene que ir al sitio.
+    const enlace = await c.js(`return {
+      href: document.getElementById('enlace-fiscal').getAttribute('href'),
+      oculto: document.getElementById('enlace-fiscal').hidden,
+      texto: document.getElementById('enlace-fiscal').textContent
+    };`);
+    ok('desde un archivo local el enlace a la skill apunta al sitio',
+       /^https:\/\/[^/]+\/fiscal\.html$/.test(enlace.href), enlace.href);
+    ok('y se ve, en vez de esconderse', enlace.oculto === false);
+    ok('y dice adónde va', /Claude/.test(enlace.texto), enlace.texto);
+
     // ── Crear el proyecto
     await c.js(`document.getElementById('btn-nuevo').click(); return true;`);
     await esperar(300);
