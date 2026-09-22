@@ -7,3 +7,9 @@
 # de mist.html que arma build.sh; build/_headers sí va versionado, porque es el
 # que lleva el CSP.
 build/index.html
+
+# El zip es un artefacto regenerable con skill/empaquetar.sh, y un binario
+# cambia entero en cada commit.
+skill/mist-causa.zip
+build/fiscal.html
+build/mist-causa.zip

@@ -52,3 +52,35 @@ PY
 mkdir -p "$raiz/build"
 cp "$salida" "$raiz/build/index.html"
 echo "$raiz/build/index.html"
+
+# La skill viaja con el sitio: sin un lugar de dónde bajarla, el zip sólo llega
+# a quien alguien se lo pase a mano. Se arma acá y no se versiona, porque un
+# binario cambia entero en cada commit y no comprime por delta.
+if ! command -v zip >/dev/null 2>&1; then
+  echo "falta el comando zip: no se puede armar la skill" >&2
+  exit 1
+fi
+sh "$raiz/skill/empaquetar.sh" >/dev/null
+cp "$raiz/skill/mist-causa.zip" "$raiz/build/mist-causa.zip"
+
+# La página de instalación se copia tal cual —es autocontenida— y se le rellenan
+# la versión y el peso, para que no haya un número escrito a mano que envejezca
+# sin que nadie se entere.
+python3 - "$raiz" <<'PY'
+import pathlib, re, sys
+
+raiz = pathlib.Path(sys.argv[1])
+skill = (raiz / 'skill/mist-causa/SKILL.md').read_text(encoding='utf-8')
+version = re.search(r'Versión (\d+\.\d+\.\d+)', skill)
+if not version:
+    sys.exit('no encontré la versión en skill/mist-causa/SKILL.md')
+version = version.group(1)
+peso = (raiz / 'build/mist-causa.zip').stat().st_size
+
+html = (raiz / 'src/fiscal.html').read_text(encoding='utf-8')
+html = html.replace('{{VERSION}}', version).replace('{{PESO}}', '%d KB' % round(peso / 1024))
+if '{{' in html:
+    sys.exit('quedaron marcadores sin rellenar en src/fiscal.html')
+(raiz / 'build/fiscal.html').write_text(html, encoding='utf-8')
+print('%s  versión %s, zip %d KB' % (raiz / 'build/fiscal.html', version, round(peso / 1024)))
+PY

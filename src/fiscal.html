@@ -1,0 +1,354 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Analizar una causa con Claude · MIST</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Página de instalación de la skill. Se sirve sólo desde el sitio; el mist.html
+  que alguien baja y abre con doble clic no la enlaza, porque ahí no existiría.
+
+  Va suelta y autocontenida a propósito: build.sh la copia tal cual, sin inlinear
+  nada, así que no puede depender de src/estilos.css. Se repiten las pocas
+  variables que hacen falta, y se respeta la regla de la interfaz: monoespaciada
+  para lo que es o fue un dato, palo seco para la herramienta hablando. El índigo
+  es lo sustituido y el ámbar lo que sale en claro, igual que en la aplicación.
+-->
+<style>
+  :root {
+    --niebla: #d5dbe3;
+    --panel: #ffffff;
+    --panel-alt: #e9edf2;
+    --tinta: #171b22;
+    --grafito: #5c6675;
+    --grafito-claro: #8a93a1;
+    --linea: #c6cdd7;
+    --linea-fina: #dfe4ea;
+    --token: #3a30c4;
+    --token-suave: #e6e4fa;
+    --riesgo: #a4470b;
+    --riesgo-suave: #f7e8d8;
+    --sans: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "SF Mono", "Menlo", ui-monospace, "Cascadia Mono", "Roboto Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--niebla);
+    color: var(--tinta);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hoja { max-width: 700px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .volver {
+    display: inline-block;
+    margin-bottom: 40px;
+    font-size: 13px;
+    color: var(--grafito);
+    text-decoration: none;
+    border-bottom: 1px solid var(--linea);
+    padding-bottom: 1px;
+  }
+  .volver:hover { color: var(--tinta); border-color: var(--grafito); }
+
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 14px; letter-spacing: -0.02em; }
+  h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--grafito-claro);
+    margin: 52px 0 18px;
+    font-weight: 600;
+  }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p { margin: 0 0 16px; }
+  .entrada { font-size: 17px; color: var(--grafito); max-width: 60ch; }
+
+  code, .mono { font-family: var(--mono); font-size: 0.92em; }
+  code { background: var(--panel-alt); padding: 1px 5px; border-radius: 3px; }
+
+  /* La invariante. Es el único dibujo de la página y tiene que poder leerse
+     sin leer el texto: índigo lo que ya está sustituido, ámbar lo que no. */
+  .arboles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 20px; }
+  .arbol { background: var(--panel); border: 1px solid var(--linea); border-radius: 6px; padding: 18px 20px; }
+  .arbol .ruta { font-family: var(--mono); font-size: 14px; font-weight: 600; display: block; margin-bottom: 10px; }
+  .arbol .que { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+  .arbol ul { margin: 12px 0 0; padding-left: 16px; font-size: 13px; color: var(--grafito); }
+  .arbol li { margin-bottom: 3px; }
+
+  .arbol.si { border-color: var(--token); background: var(--token-suave); }
+  .arbol.si .ruta, .arbol.si .que { color: var(--token); }
+  .arbol.no { border-color: var(--riesgo); background: var(--riesgo-suave); }
+  .arbol.no .ruta, .arbol.no .que { color: var(--riesgo); }
+
+  .bajada {
+    background: var(--panel);
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    padding: 22px 24px;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .bajada b { display: block; font-size: 16px; }
+  .bajada span { font-size: 13px; color: var(--grafito); font-family: var(--mono); }
+  .boton {
+    background: var(--token);
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px 22px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  .boton:hover { background: #2f27a3; }
+
+  ol.pasos { counter-reset: paso; list-style: none; padding: 0; margin: 0; }
+  ol.pasos > li {
+    counter-increment: paso;
+    position: relative;
+    padding: 0 0 26px 46px;
+    border-left: 1px solid var(--linea);
+    margin-left: 13px;
+  }
+  ol.pasos > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  ol.pasos > li::before {
+    content: counter(paso);
+    position: absolute;
+    left: -13px;
+    top: -2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--tinta);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+  }
+  ol.pasos p { font-size: 14px; color: var(--grafito); margin-bottom: 10px; }
+
+  .decir {
+    background: var(--panel);
+    border-left: 2px solid var(--linea);
+    padding: 12px 16px;
+    margin: 0 0 12px;
+    font-size: 14px;
+  }
+  .decir .mono { color: var(--token); font-weight: 600; }
+
+  .alerta {
+    background: var(--riesgo-suave);
+    border: 1px solid var(--riesgo);
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin: 0 0 16px;
+  }
+  .alerta h3 { color: var(--riesgo); }
+  .alerta p:last-child { margin-bottom: 0; }
+  .alerta p { font-size: 14px; }
+
+  ul.limites { padding-left: 18px; margin: 0; font-size: 14px; color: var(--grafito); }
+  ul.limites li { margin-bottom: 12px; }
+  ul.limites b { color: var(--tinta); font-weight: 600; }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 22px;
+    border-top: 1px solid var(--linea);
+    font-size: 13px;
+    color: var(--grafito-claro);
+  }
+  footer a { color: var(--grafito); }
+
+  @media (max-width: 620px) {
+    .hoja { padding: 36px 20px 64px; }
+    h1 { font-size: 25px; }
+    .arboles { grid-template-columns: 1fr; }
+    .bajada { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<div class="hoja">
+
+<!-- index.html y no "./": así vuelve tanto servido por web como
+     abierto como archivo, donde "./" es el listado de la carpeta. -->
+<a class="volver" href="index.html">← Volver a MIST</a>
+
+<h1>Analizar una causa con Claude</h1>
+
+<p class="entrada">
+  MIST reemplaza los datos sensibles de una planilla por tokens estables. Esto es
+  lo que viene después: cómo dejar la máquina preparada para analizar esas
+  planillas con Claude Desktop sin que los nombres reales aparezcan nunca en la
+  conversación.
+</p>
+
+<h2>La idea, en una línea</h2>
+
+<div class="arboles">
+  <div class="arbol si">
+    <span class="ruta">~/Casos/</span>
+    <span class="que">Tokens · Claude sí</span>
+    <ul>
+      <li>Las planillas desensibilizadas</li>
+      <li>La base de datos de la causa</li>
+      <li>Los resultados del análisis</li>
+    </ul>
+  </div>
+  <div class="arbol no">
+    <span class="ruta">~/Reservado/</span>
+    <span class="que">Nombres · Claude nunca</span>
+    <ul>
+      <li>Las planillas originales</li>
+      <li>La bóveda, con la clave maestra</li>
+      <li>Los informes ya reconstruidos</li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  Dos carpetas separadas, y no dos subcarpetas de una misma. Si la causa viviera
+  en una sola carpeta, tarde o temprano se le adjuntaría a Claude la carpeta
+  madre —es un clic menos— y Claude tendría al mismo tiempo las planillas con
+  tokens y la bóveda que las traduce. Separarlas hace que adjuntar de más deje de
+  ser un descuido y pase a ser una decisión.
+</p>
+
+<h2>Bajar</h2>
+
+<div class="bajada">
+  <div>
+    <b>mist-causa</b>
+    <span>versión {{VERSION}} · {{PESO}}</span>
+  </div>
+  <a class="boton" href="mist-causa.zip" download>Bajar el .zip</a>
+</div>
+<p style="font-size:13px;color:var(--grafito-claro)">
+  Adentro está la metodología, más los guiones que arman el entorno y verifican
+  que la desensibilización haya ocurrido de verdad.
+</p>
+
+<h2>Instalar</h2>
+
+<ol class="pasos">
+  <li>
+    <h3>Subir el .zip a Claude Desktop</h3>
+    <p>
+      En Claude Desktop, <b>Customize → Skills → Upload</b>. Se sube el archivo
+      tal como se bajó, sin descomprimir.
+    </p>
+  </li>
+  <li>
+    <h3>Pedirle a Claude que prepare la máquina</h3>
+    <p>Alcanza con decírselo:</p>
+    <div class="decir">
+      <span class="mono">Preparame el entorno para trabajar una causa con MIST.</span>
+    </div>
+    <p>
+      Claude deja en el escritorio un archivo <code>instalar-mist.command</code>.
+      Se abre con doble clic —no hace falta usar la terminal— y pregunta antes de
+      hacer nada. Crea las dos carpetas, instala DuckDB para poder consultar las
+      planillas, baja MIST, y <b>escribe la regla que le impide a Claude leer
+      <span class="mono">~/Reservado</span></b>. No pide contraseña de
+      administrador ni toca nada fuera de tu usuario.
+    </p>
+  </li>
+  <li>
+    <h3>Adjuntar <span class="mono">~/Casos</span></h3>
+    <p>
+      Es la carpeta sobre la que vas a trabajar. Adjuntar no es una barrera
+      —Claude puede alcanzar el resto del disco igual—, pero mantiene a la vista
+      sólo lo que tiene tokens.
+    </p>
+    <div class="alerta">
+      <h3>Lo que te protege es la regla, no la carpeta que adjuntás</h3>
+      <p>
+        Adjuntar una carpeta define dónde trabaja Claude, no hasta dónde llega.
+        Lo que corta el acceso a la bóveda es la regla que escribió el
+        instalador. Si esa regla no está, todos los tokens vuelven a ser nombres
+        y ningún cartel te avisa.
+      </p>
+    </div>
+  </li>
+  <li>
+    <h3>Comprobar que quedó bien</h3>
+    <p>
+      Antes de trabajar con datos de verdad, pedile a Claude que verifique el
+      entorno. Va a comprobar que la regla esté escrita <i>y</i> va a intentar
+      leer un archivo de <span class="mono">~/Reservado</span> que <b>tiene que
+      fallar</b>. Son dos cosas distintas: una mira que la regla exista, la otra
+      que se esté aplicando. Si el archivo se lee, algo quedó mal y te lo va a
+      decir.
+    </p>
+  </li>
+</ol>
+
+<h2>Después, cada causa</h2>
+
+<p>
+  Una causa por proyecto y por carpeta, siempre. Los tokens de una causa no
+  significan nada en otra, y eso es una protección, no una molestia: un archivo
+  suelto en el lugar equivocado no resuelve mal, avisa que viene de otra clave.
+</p>
+
+<p>
+  Las planillas originales van a <code>~/Reservado/&lt;causa&gt;/crudo</code>, pasan
+  por MIST, y las desensibilizadas quedan en
+  <code>~/Casos/&lt;causa&gt;/limpio</code>. De ahí en adelante se le pregunta a
+  Claude en castellano: las consultas las escribe y las corre él. Cuando el
+  resultado tenga que volver a tener nombres, se reconstruye en MIST, en la
+  pestaña <i>Reconstruir</i>.
+</p>
+
+<h2>Lo que esto no resuelve</h2>
+
+<p style="font-size:14px">
+  Vale la pena tenerlo escrito. Prometer lo contrario sería peor que no tener
+  nada:
+</p>
+
+<ul class="limites">
+  <li>
+    <b>Copiar y pegar gana siempre.</b> Claude avisa si detecta datos personales
+    en lo que le mandás, pero es una detección, no una barrera. El momento más
+    probable es al final: con el informe ya reconstruido en la mano, pedirle que
+    mejore la redacción. Ese texto tiene nombres reales.
+  </li>
+  <li>
+    <b>La regla corta las herramientas de archivo, no el sistema operativo.</b>
+    Un programa que Claude escriba y ejecute —un guión de Python, por ejemplo—
+    abre archivos por su cuenta y la regla no lo alcanza. Protege contra el
+    descuido, que es el riesgo real, no contra alguien decidido.
+  </li>
+  <li>
+    <b>Los nombres que sólo viven en texto libre siguen saliendo en claro.</b>
+    MIST reconoce dentro de un comentario únicamente las formas que ya vio en
+    alguna columna clasificada. Un testigo mencionado sólo en una observación no
+    tiene con qué ser reconocido.
+  </li>
+  <li>
+    <b>Los PDFs y los documentos quedan afuera.</b> MIST trabaja sobre planillas.
+    Un expediente o una declaración no se pueden desensibilizar: si hacen falta
+    los datos que tienen adentro, se transcriben a una planilla y esa planilla
+    pasa por MIST.
+  </li>
+</ul>
+
+<footer>
+  El detalle completo está en el
+  <a href="https://github.com/NielsenMax/mist">repositorio</a>: el manual del
+  operador en <span class="mono">MANUAL.md</span> y la skill en
+  <span class="mono">skill/</span>.
+</footer>
+
+</div>

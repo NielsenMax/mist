@@ -112,9 +112,20 @@ input[type="search"] { font-family: var(--mono); font-size: 12.5px; }
 }
 .marca span { font-size: 11.5px; color: #8f98a6; letter-spacing: .02em; }
 
+.enlace-barra {
+  margin-left: auto;
+  font-size: 12px;
+  color: #8f98a6;
+  text-decoration: none;
+  padding: 4px 8px;
+  border: 1px solid #333a46;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.enlace-barra:hover { color: #fff; border-color: #59636f; background: #242b35; }
+
 .proyecto {
   display: flex; align-items: baseline; gap: 9px;
-  margin-left: auto;
 }
 .proyecto .etq { font-size: 10.5px; text-transform: uppercase; letter-spacing: .12em; color: #8f98a6; }
 .proyecto b { font-size: 13px; font-weight: 600; color: #e7eaef; }
@@ -502,6 +513,11 @@ dialog .pie { display: flex; flex-direction: row-reverse; justify-content: flex-
 
 <header class="barra">
   <div class="marca"><b>MIST</b><span>desensibilización de planillas</span></div>
+
+  <!-- Va en la barra y no en la portada para que se llegue desde cualquier
+       punto: una vez elegido el proyecto, la portada ya no está. El destino lo
+       decide 60-ui.js, porque desde un archivo local no hay sitio al lado. -->
+  <a class="enlace-barra" id="enlace-fiscal" href="fiscal.html">Analizar con Claude</a>
 
   <div class="proyecto" id="caja-proyecto" hidden>
     <span class="etq">proyecto</span>
@@ -3584,6 +3600,12 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
   var TOPE_LISTA = 300;
   var FILAS_PREVIA = 40;
 
+  /* Adónde mandar al operador cuando mist.html está abierto desde el disco y no
+   * hay un sitio alrededor. El proyecto se publica en dos dominios con el mismo
+   * contenido; acá va uno solo porque un archivo local no tiene cómo saber de
+   * cuál de los dos salió. */
+  var SITIO = 'https://mist.fernet.cc/';
+
   /* ── Utilidades ───────────────────────────────────────────────────── */
 
   function $(id) { return document.getElementById(id); }
@@ -5308,6 +5330,17 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
         ? 'Se guarda solo en el navegador; la copia en disco la bajás como .zip.'
         : 'La bóveda se baja como un archivo único que guardás vos.';
       $('nota-abrir').textContent = 'De este navegador, de una carpeta o de un .zip.';
+    }
+
+    /* La página de instalación de la skill vive en el sitio, no adentro de este
+     * archivo. Servido por web es la de al lado; abierto con doble clic desde el
+     * disco no hay una al lado, así que se apunta al sitio. Esconder el enlace
+     * sería peor: el caso del archivo local es justo el que más lo necesita.
+     *
+     * Que el enlace exista no rompe "ninguna petición de red": una navegación
+     * que hace el operador no es algo que la aplicación pida por su cuenta. */
+    if (!/^https?:$/.test(global.location.protocol)) {
+      $('enlace-fiscal').href = SITIO + 'fiscal.html';
     }
 
     /* Cerrar con cambios sin guardar es exactamente el accidente que esta

@@ -11,6 +11,11 @@
 <header class="barra">
   <div class="marca"><b>MIST</b><span>desensibilización de planillas</span></div>
 
+  <!-- Va en la barra y no en la portada para que se llegue desde cualquier
+       punto: una vez elegido el proyecto, la portada ya no está. El destino lo
+       decide 60-ui.js, porque desde un archivo local no hay sitio al lado. -->
+  <a class="enlace-barra" id="enlace-fiscal" href="fiscal.html">Analizar con Claude</a>
+
   <div class="proyecto" id="caja-proyecto" hidden>
     <span class="etq">proyecto</span>
     <b id="nombre-proyecto"></b>
